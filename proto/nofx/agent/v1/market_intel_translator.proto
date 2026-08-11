@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package nofx.agent.v1;
+
+option go_package = "nofx/api/grpcpb/agentv1;agentv1";
+
+// MarketIntelTranslator 供宏观数据进程直连 agent-runtime 的内部翻译服务。
+// 该服务只负责把英文资讯翻译为结构化中文字段，不参与任何 backend 业务逻辑。
+service MarketIntelTranslator {
+  rpc Translate(TranslateMarketIntelRequest) returns (TranslateMarketIntelResponse);
+}
+
+message TranslateMarketIntelRequest {
+  string trace_id = 1;
+  string title = 2;
+  string summary = 3;
+  string content = 4;
+  string source = 5;
+  string link = 6;
+}
+
+message TranslateMarketIntelResponse {
+  string title_zh = 1;
+  string summary_zh = 2;
+}

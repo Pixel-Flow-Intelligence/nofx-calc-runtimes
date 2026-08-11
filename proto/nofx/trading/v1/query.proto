@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package nofx.trading.v1;
+
+import "nofx/common/v1/errors.proto";
+
+option go_package = "nofx/proto/gen/go/nofx/trading/v1;tradingv1";
+
+// TradingQueryService 定义 trading-runtime 对其它 runtime 暴露的只读查询能力。
+service TradingQueryService {
+  rpc ListAgentRuntimes(ListAgentRuntimesRequest) returns (ListAgentRuntimesResponse);
+  rpc GetExchangeById(GetExchangeByIdRequest) returns (GetExchangeByIdResponse);
+  rpc ListAgentPositions(ListAgentPositionsRequest) returns (ListAgentPositionsResponse);
+}
+
+message TradingAgentRuntimeView {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string exchange_id = 4;
+  string exchange_type = 5;
+  string provider_id = 6;
+  string ai_model_key = 7;
+  bool is_running = 8;
+  string position_mode = 9;
+}
+
+message TradingExchangeView {
+  string id = 1;
+  string user_id = 2;
+  string exchange_type = 3;
+  string account_name = 4;
+  bool enabled = 5;
+  bool testnet = 6;
+  bool is_demo = 7;
+}
+
+message TradingPositionView {
+  int64 id = 1;
+  string agent_id = 2;
+  string exchange_id = 3;
+  string exchange_type = 4;
+  string symbol = 5;
+  string side = 6;
+  double quantity = 7;
+  double entry_price = 8;
+  double unrealized_pnl = 9;
+  string status = 10;
+}
+
+message ListAgentRuntimesRequest {
+  string user_id = 1;
+}
+
+message ListAgentRuntimesResponse {
+  repeated TradingAgentRuntimeView items = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}
+
+message GetExchangeByIdRequest {
+  string user_id = 1;
+  string exchange_id = 2;
+}
+
+message GetExchangeByIdResponse {
+  TradingExchangeView item = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}
+
+message ListAgentPositionsRequest {
+  string agent_id = 1;
+}
+
+message ListAgentPositionsResponse {
+  repeated TradingPositionView items = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}

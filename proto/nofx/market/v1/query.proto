@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package nofx.market.v1;
+
+import "nofx/common/v1/errors.proto";
+
+option go_package = "nofx/proto/gen/go/nofx/market/v1;marketv1";
+
+// MarketQueryService 定义 market-runtime 对其它 runtime 暴露的只读行情能力。
+service MarketQueryService {
+  rpc GetMarketSnapshot(GetMarketSnapshotRequest) returns (GetMarketSnapshotResponse);
+  rpc GetMarketKlines(GetMarketKlinesRequest) returns (GetMarketKlinesResponse);
+}
+
+message MarketSnapshotView {
+  string symbol = 1;
+  string exchange = 2;
+  double last_price = 3;
+  double price_change_percent = 4;
+  double volume = 5;
+}
+
+message MarketKlineView {
+  int64 open_time = 1;
+  double open = 2;
+  double high = 3;
+  double low = 4;
+  double close = 5;
+  double volume = 6;
+}
+
+message GetMarketSnapshotRequest {
+  string symbol = 1;
+  string exchange = 2;
+}
+
+message GetMarketSnapshotResponse {
+  MarketSnapshotView item = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}
+
+message GetMarketKlinesRequest {
+  string symbol = 1;
+  string exchange = 2;
+  string timeframe = 3;
+  int32 limit = 4;
+}
+
+message GetMarketKlinesResponse {
+  repeated MarketKlineView items = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package nofx.analytics.v1;
+
+import "nofx/common/v1/errors.proto";
+
+option go_package = "nofx/proto/gen/go/nofx/analytics/v1;analyticsv1";
+
+// AnalyticsQueryService 定义 analytics-runtime 对其它 runtime 暴露的只读分析能力。
+service AnalyticsQueryService {
+  rpc GetDashboardOverview(GetDashboardOverviewRequest) returns (GetDashboardOverviewResponse);
+  rpc GetMarketResearchTask(GetMarketResearchTaskRequest) returns (GetMarketResearchTaskResponse);
+}
+
+message GetDashboardOverviewRequest {
+  string user_id = 1;
+}
+
+message GetDashboardOverviewResponse {
+  string json_payload = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}
+
+message GetMarketResearchTaskRequest {}
+
+message GetMarketResearchTaskResponse {
+  string json_payload = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}

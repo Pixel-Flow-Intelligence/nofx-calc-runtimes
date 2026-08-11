@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package nofx.user.v1;
+
+import "nofx/common/v1/errors.proto";
+
+option go_package = "nofx/proto/gen/go/nofx/user/v1;userv1";
+
+// UserQueryService 定义 user-runtime 对其它 runtime 暴露的只读用户域能力。
+service UserQueryService {
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse);
+  rpc ResolveWorkspaceContext(ResolveWorkspaceContextRequest) returns (ResolveWorkspaceContextResponse);
+}
+
+message UserProfileView {
+  string user_id = 1;
+  string email = 2;
+  bool otp_verified = 3;
+  bool otp_enabled = 4;
+  string assist_select_model_id = 5;
+}
+
+message GetUserProfileRequest {
+  string user_id = 1;
+}
+
+message GetUserProfileResponse {
+  UserProfileView item = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}
+
+message ResolveWorkspaceContextRequest {
+  string user_id = 1;
+  string agent_id = 2;
+}
+
+message ResolveWorkspaceContextResponse {
+  string agent_id = 1;
+  string runtime_agent_id = 2;
+  string user_agent_id = 3;
+  nofx.common.v1.ErrorDetail error = 4;
+}

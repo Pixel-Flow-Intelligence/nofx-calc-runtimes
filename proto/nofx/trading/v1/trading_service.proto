@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package nofx.trading.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/trading/v1;tradingv1";
+
+// TradingService 承载交易服务对其它后端模块暴露的内部 gRPC 能力。
+// 前端与 CLI 仍通过 gateway / business 暴露的 HTTP 入口访问，内部跨进程统一改走 gRPC。
+service TradingService {
+  // ProxyExchangeRoute 以 gRPC 方式复用交易服务现有 HTTP 路由与 handler，
+  // 替代 business 对交易服务的内部 HTTP 透传。
+  rpc ProxyExchangeRoute(TradingRouteRequest) returns (TradingRouteResponse);
+
+  // EnsureDefaultBuiltinBindings 由 user-runtime 调用，要求 trading-runtime
+  // 根据交易域规则补齐默认内置智能体与默认交易所账户的绑定关系。
+  rpc EnsureDefaultBuiltinBindings(EnsureDefaultBuiltinBindingsRequest) returns (EnsureDefaultBuiltinBindingsResponse);
+}
+
+message TradingRouteRequest {
+  string caller_service = 1;
+  string user_id = 2;
+  string email = 3;
+  string method = 4;
+  string path = 5;
+  string raw_query = 6;
+  string body = 7;
+  string content_type = 8;
+  string request_id = 9;
+}
+
+message TradingRouteResponse {
+  int32 status_code = 1;
+  string content_type = 2;
+  string body = 3;
+}
+
+message EnsureDefaultBuiltinBindingsRequest {
+  string user_id = 1;
+}
+
+message EnsureDefaultBuiltinBindingsResponse {
+  bool ok = 1;
+}

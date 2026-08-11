@@ -1,0 +1,12 @@
+[project]
+name = "trendln-runtime"
+version = "0.1.0"
+description = "Trendln Python bridge dependencies"
+requires-python = ">=3.12"
+dependencies = [
+  "pandas>=2.2,<3.0",
+  "trendln",
+]
+
+[tool.uv]
+package = false

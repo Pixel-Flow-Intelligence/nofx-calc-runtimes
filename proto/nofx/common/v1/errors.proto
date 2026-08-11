@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package nofx.common.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/common/v1;commonv1";
+
+// ErrorDetail 表示跨 runtime 返回给调用方的结构化错误信息。
+message ErrorDetail {
+  string code = 1;
+  string message = 2;
+  string domain = 3;
+  repeated ValidationError validation_errors = 4;
+}
+
+// ValidationError 表示字段级参数校验失败。
+message ValidationError {
+  string field = 1;
+  string reason = 2;
+}

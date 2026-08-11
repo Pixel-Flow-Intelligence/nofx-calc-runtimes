@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package nofx.trading.v1;
+
+import "nofx/common/v1/errors.proto";
+
+option go_package = "nofx/proto/gen/go/nofx/trading/v1;tradingv1";
+
+// TradingCommandService 定义 trading-runtime 对其它 runtime 暴露的写操作能力。
+service TradingCommandService {
+  rpc EnsureSimulatedExchange(EnsureSimulatedExchangeRequest) returns (EnsureSimulatedExchangeResponse);
+  rpc CreateInitialDecisionRecord(CreateInitialDecisionRecordRequest) returns (CreateInitialDecisionRecordResponse);
+}
+
+message EnsureSimulatedExchangeRequest {
+  string user_id = 1;
+}
+
+message EnsureSimulatedExchangeResponse {
+  string exchange_id = 1;
+  string exchange_type = 2;
+  bool created = 3;
+  nofx.common.v1.ErrorDetail error = 4;
+}
+
+message CreateInitialDecisionRecordRequest {
+  string user_id = 1;
+  string agent_id = 2;
+  string symbol = 3;
+}
+
+message CreateInitialDecisionRecordResponse {
+  string decision_id = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}

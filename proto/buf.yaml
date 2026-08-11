@@ -1,0 +1,10 @@
+# Buf 模块：HTTP/gRPC 契约（手写 .proto 在 proto/；OpenAPI 由生成插件产出至 proto/gen/openapi）。
+version: v1
+deps:
+  - buf.build/googleapis/googleapis
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE

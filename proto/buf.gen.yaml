@@ -1,0 +1,21 @@
+# 生成物路径相对于本文件所在目录 proto/（仓库根）。
+# Go import 前缀应与 business/go.mod 中 replace nofx/proto/gen/go => ../proto/gen/go 一致；
+# 建议在各类 .proto 中写明 option go_package = "nofx/proto/gen/go/<导入路径>;<短包名>";。
+version: v1
+managed:
+  enabled: true
+plugins:
+  - plugin: buf.build/protocolbuffers/go:v1.36.10
+    out: gen/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc/go:v1.6.0
+    out: gen/go
+    opt:
+      - paths=source_relative
+  - plugin: buf.build/grpc-ecosystem/gateway:v2.27.3
+    out: gen/go
+    opt:
+      - paths=source_relative
+  # OpenAPI 文档由 scripts/gen-backend-api-proto.sh 在 buf generate 之后调用
+  # protoc-gen-openapiv3 生成（直接 OpenAPI 3.1 JSON，不经 Swagger 2.0）。

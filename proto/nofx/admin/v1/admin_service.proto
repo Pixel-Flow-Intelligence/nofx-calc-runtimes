@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package nofx.admin.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/admin/v1;adminv1";
+
+// AdminService 只供 admin-backend 通过内部 gRPC 调用 business 的管理控制面接口。
+// 该服务与 agent/runtime 的 AgentTools 完全隔离，避免 agent 侧看到或触达后台控制能力。
+service AdminService {
+  // AdminControl 为 admin-backend 提供业务管理入口；仅允许 admin-backend 通过内部 token 调用。
+  rpc AdminControl(AdminRequest) returns (AdminResponse);
+  // ListBinanceCandidateSymbols 返回管理后台候选上架币种；仅允许 admin-backend 调用。
+  rpc ListBinanceCandidateSymbols(AdminRequest) returns (AdminResponse);
+  // SyncMarketIntelOnce 触发一次市场情报同步；仅允许 admin-backend 调用。
+  rpc SyncMarketIntelOnce(AdminRequest) returns (AdminResponse);
+  // GetMarketIntelSyncStatus 返回最近一次市场情报同步状态；仅允许 admin-backend 调用。
+  rpc GetMarketIntelSyncStatus(AdminRequest) returns (AdminResponse);
+}
+
+message AdminRequest {
+  // trace_id 贯穿 admin-backend 与 business，便于日志串联。
+  string trace_id = 1;
+  // input_json 为各管理接口的参数 JSON。
+  string input_json = 2;
+}
+
+message AdminResponse {
+  // json_payload 与原管理 HTTP 响应体一致。
+  string json_payload = 1;
+  // status_code 对齐业务 HTTP 状态码。
+  int32 status_code = 2;
+}

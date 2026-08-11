@@ -1,0 +1,85 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "backend_health",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/proto-health/ping": {
+      "get": {
+        "tags": [
+          "BackendHealthService"
+        ],
+        "operationId": "BackendHealthService_Ping",
+        "responses": {
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/google.rpc.Status"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "A successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nofx.backend.v1.PingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "google.rpc.Status": {
+        "type": "object",
+        "description": "The Status type defines a logical error model suitable for different programming environments.",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The status code, which should be an enum value of google.rpc.Code."
+          },
+          "details": {
+            "type": "array",
+            "description": "A list of messages that carry the error details.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "A developer-facing error message."
+          }
+        }
+      },
+      "nofx.backend.v1.PingResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "BackendHealthService",
+      "description": "BackendHealthService 提供后端最小 gRPC 自检占位能力（供网关与 Proto 链路对齐）。"
+    }
+  ]
+}

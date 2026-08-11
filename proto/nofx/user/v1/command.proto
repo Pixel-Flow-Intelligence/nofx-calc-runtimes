@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package nofx.user.v1;
+
+import "nofx/common/v1/errors.proto";
+
+option go_package = "nofx/proto/gen/go/nofx/user/v1;userv1";
+
+// UserCommandService 定义 user-runtime 对其它 runtime 暴露的写操作能力。
+service UserCommandService {
+  rpc EnsureBuiltinAgents(EnsureBuiltinAgentsCommandRequest) returns (EnsureBuiltinAgentsCommandResponse);
+  rpc UpsertLLMBinding(UpsertLLMBindingCommandRequest) returns (UpsertLLMBindingCommandResponse);
+}
+
+message EnsureBuiltinAgentsCommandRequest {
+  string user_id = 1;
+}
+
+message EnsureBuiltinAgentsCommandResponse {
+  int32 count = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}
+
+message UpsertLLMBindingCommandRequest {
+  string user_id = 1;
+  string llm_user_id = 2;
+  string llm_api_key = 3;
+  string status = 4;
+}
+
+message UpsertLLMBindingCommandResponse {
+  bool ok = 1;
+  nofx.common.v1.ErrorDetail error = 2;
+}

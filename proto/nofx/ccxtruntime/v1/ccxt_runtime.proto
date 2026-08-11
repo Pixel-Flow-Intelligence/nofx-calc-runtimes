@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package nofx.ccxtruntime.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/ccxtruntime/v1;ccxtruntimev1";
+
+// CCXTRuntimeService 承载所有需要 CCXT 依赖链的行情与交易所能力。
+// 业务服务通过 gRPC 调用它，避免在 business 主程序内直接编译 ccxt/go-ethereum。
+service CCXTRuntimeService {
+  rpc GetCurrentPrice(GetCurrentPriceRequest) returns (GetCurrentPriceResponse);
+  rpc FetchKlines(FetchKlinesRequest) returns (FetchKlinesResponse);
+  rpc FetchOpenInterest(FetchOpenInterestRequest) returns (FetchOpenInterestResponse);
+  rpc FetchFundingRate(FetchFundingRateRequest) returns (FetchFundingRateResponse);
+
+  rpc FetchBalance(FetchBalanceRequest) returns (FetchBalanceResponse);
+  rpc FetchPositions(FetchPositionsRequest) returns (FetchPositionsResponse);
+  rpc FetchPosition(FetchPositionRequest) returns (FetchPositionResponse);
+  rpc FetchTicker(FetchTickerRequest) returns (FetchTickerResponse);
+  rpc FetchSymbolTradingRules(FetchSymbolTradingRulesRequest) returns (FetchSymbolTradingRulesResponse);
+  rpc PlaceMarketOrder(PlaceMarketOrderRequest) returns (OrderResponse);
+  rpc PlaceLimitOrder(PlaceLimitOrderRequest) returns (OrderResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (OrderResponse);
+  rpc SetLeverage(SetLeverageRequest) returns (ActionResponse);
+  rpc SetMarginMode(SetMarginModeRequest) returns (ActionResponse);
+  rpc CancelAllOrders(CancelAllOrdersRequest) returns (ActionResponse);
+  rpc FetchOrder(FetchOrderRequest) returns (OrderResponse);
+  rpc FetchOpenOrders(FetchOpenOrdersRequest) returns (FetchOpenOrdersResponse);
+  rpc FetchMyTrades(FetchMyTradesRequest) returns (FetchMyTradesResponse);
+  rpc FetchClosedOrders(FetchClosedOrdersRequest) returns (FetchClosedOrdersResponse);
+  rpc FetchPositionsHistory(FetchPositionsHistoryRequest) returns (FetchPositionsHistoryResponse);
+}
+
+message ExchangeCredentials {
+  string exchange_id = 1;
+  string exchange_type = 2;
+  string api_key = 3;
+  string secret_key = 4;
+  string passphrase = 5;
+  bool testnet = 6;
+  bool is_demo = 7;
+}
+
+message KlineData {
+  int64 open_time = 1;
+  double open = 2;
+  double high = 3;
+  double low = 4;
+  double close = 5;
+  double volume = 6;
+  int64 close_time = 7;
+}
+
+message PositionData {
+  string id = 1;
+  string symbol = 2;
+  string side = 3;
+  double contracts = 4;
+  double entry_price = 5;
+  double mark_price = 6;
+  double unrealized_pnl = 7;
+  double leverage = 8;
+  double realized_pnl = 9;
+  int64 timestamp = 10;
+  string info_json = 11;
+}
+
+message OrderData {
+  string id = 1;
+  string status = 2;
+  string symbol = 3;
+  string side = 4;
+  string type = 5;
+  double amount = 6;
+  double filled = 7;
+  double average = 8;
+  double price = 9;
+  double trigger_price = 10;
+  double stop_loss_price = 11;
+  double take_profit_price = 12;
+  int64 timestamp = 13;
+  string info_json = 14;
+  double fee_cost = 15;
+  string client_order_id = 16;
+}
+
+message TradeData {
+  string id = 1;
+  string order_id = 2;
+  string symbol = 3;
+  string side = 4;
+  string type = 5;
+  double amount = 6;
+  double price = 7;
+  double cost = 8;
+  double fee_cost = 9;
+  string fee_currency = 10;
+  bool maker = 11;
+  int64 timestamp = 12;
+  string info_json = 13;
+  double realized_pnl = 14;
+  string client_order_id = 15;
+  string position_side = 16;
+  bool reduce_only = 17;
+}
+
+message TickerData {
+  double last = 1;
+  double close = 2;
+  double bid = 3;
+  double ask = 4;
+}
+
+message SymbolTradingRulesData {
+  string symbol = 1;
+  double min_order_amount = 2;
+  double max_order_amount = 3;
+  double market_min_order_amount = 4;
+  double amount_step = 5;
+  double min_notional = 6;
+  double price_step = 7;
+  double min_price = 8;
+  double max_price = 9;
+  double max_leverage = 10;
+}
+
+message GetCurrentPriceRequest {
+  string symbol = 1;
+  string exchange = 2;
+}
+
+message GetCurrentPriceResponse {
+  double price = 1;
+}
+
+message FetchKlinesRequest {
+  string exchange = 1;
+  string symbol = 2;
+  string timeframe = 3;
+  int64 limit = 4;
+}
+
+message FetchKlinesResponse {
+  repeated KlineData klines = 1;
+}
+
+message FetchOpenInterestRequest {
+  string exchange = 1;
+  string symbol = 2;
+}
+
+message FetchOpenInterestResponse {
+  double latest = 1;
+  double average = 2;
+}
+
+message FetchFundingRateRequest {
+  string exchange = 1;
+  string symbol = 2;
+}
+
+message FetchFundingRateResponse {
+  double rate = 1;
+}
+
+message FetchBalanceRequest {
+  ExchangeCredentials credentials = 1;
+}
+
+message FetchBalanceResponse {
+  double available_balance = 1;
+  double margin_used = 2;
+  double wallet_balance = 3;
+}
+
+message FetchPositionsRequest {
+  ExchangeCredentials credentials = 1;
+  repeated string symbols = 2;
+}
+
+message FetchPositionsResponse {
+  repeated PositionData positions = 1;
+}
+
+message FetchPositionRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+}
+
+message FetchPositionResponse {
+  PositionData position = 1;
+}
+
+message FetchTickerRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+}
+
+message FetchTickerResponse {
+  TickerData ticker = 1;
+}
+
+message FetchSymbolTradingRulesRequest {
+  string exchange = 1;
+  repeated string symbols = 2;
+}
+
+message FetchSymbolTradingRulesResponse {
+  repeated SymbolTradingRulesData rules = 1;
+}
+
+message PlaceMarketOrderRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+  string side = 3;
+  double amount = 4;
+  string params_json = 5;
+}
+
+message PlaceLimitOrderRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+  string side = 3;
+  double amount = 4;
+  double price = 5;
+  string params_json = 6;
+}
+
+message CancelOrderRequest {
+  ExchangeCredentials credentials = 1;
+  string order_id = 2;
+  string symbol = 3;
+}
+
+message SetLeverageRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+  int64 leverage = 3;
+}
+
+message SetMarginModeRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+  bool is_cross_margin = 3;
+}
+
+message CancelAllOrdersRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+}
+
+message FetchOrderRequest {
+  ExchangeCredentials credentials = 1;
+  string order_id = 2;
+  string symbol = 3;
+}
+
+message FetchOpenOrdersRequest {
+  ExchangeCredentials credentials = 1;
+  string symbol = 2;
+}
+
+message FetchOpenOrdersResponse {
+  repeated OrderData orders = 1;
+}
+
+message FetchMyTradesRequest {
+  ExchangeCredentials credentials = 1;
+  int64 since_ms = 2;
+  int64 limit = 3;
+  string params_json = 4;
+}
+
+message FetchMyTradesResponse {
+  repeated TradeData trades = 1;
+}
+
+message FetchClosedOrdersRequest {
+  ExchangeCredentials credentials = 1;
+  int64 since_ms = 2;
+  int64 limit = 3;
+  string params_json = 4;
+}
+
+message FetchClosedOrdersResponse {
+  repeated OrderData orders = 1;
+}
+
+message FetchPositionsHistoryRequest {
+  ExchangeCredentials credentials = 1;
+  int64 since_ms = 2;
+  int64 limit = 3;
+  string params_json = 4;
+}
+
+message FetchPositionsHistoryResponse {
+  repeated PositionData positions = 1;
+}
+
+message OrderResponse {
+  OrderData order = 1;
+}
+
+message ActionResponse {
+  bool ok = 1;
+}

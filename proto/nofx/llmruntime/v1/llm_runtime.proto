@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package nofx.llmruntime.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/llmruntime/v1;llmruntimev1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+
+// LLMRuntimeService 描述 llm-runtime 对外业务能力 HTTP 契约（与 Gin 中业务路由一致）。
+// GET /docs、GET /openapi.yaml 仅为运行时文档与自检入口，由 Gin 手写挂载，不纳入 Proto/OpenAPI 契约。
+// 本文件供 Buf / protoc-gen-openapiv3 生成 OpenAPI，并经脚本同步到 llm-runtime/openapi/openapi.yaml。
+service LLMRuntimeService {
+  // PostV1ChatCompletions 转发 OpenAI 兼容的聊天补全请求；请求体为任意 JSON（模型名、messages、参数等）。
+  rpc PostV1ChatCompletions(google.protobuf.Struct) returns (google.protobuf.Struct) {
+    option (google.api.http) = {
+      post: "/v1/chat/completions"
+      body: "*"
+    };
+  }
+
+  // GetV1Models 返回当前用户可见模型列表等业务封装（HTTP 自有壳 JSON，见 GenericEnvelope）。
+  rpc GetV1Models(GetV1ModelsRequest) returns (GenericEnvelope) {
+    option (google.api.http) = {get: "/v1/models"};
+  }
+
+  // GetV1RuntimeTarget 返回模型路由所需的运行时目标（URL、场景、兼容模式等）。
+  rpc GetV1RuntimeTarget(GetV1RuntimeTargetRequest) returns (RuntimeTargetResponse) {
+    option (google.api.http) = {get: "/v1/runtime-target"};
+  }
+
+  // PostV1UserLlmBind 为用户建立或刷新模型网关绑定（可选强制重新签发虚拟 Key）。
+  rpc PostV1UserLlmBind(LLMBindRequest) returns (GenericEnvelope) {
+    option (google.api.http) = {
+      post: "/v1/user/llm/bind"
+      body: "*"
+    };
+  }
+}
+
+// GetV1ModelsRequest 查询模型列表时的可选过滤。
+message GetV1ModelsRequest {
+  // scene 区分调用场景（如 agent / research）；缺省时运行时可按默认 agent 行为处理。
+  string scene = 1;
+}
+
+// GetV1RuntimeTargetRequest 查询运行时路由目标时的可选过滤。
+message GetV1RuntimeTargetRequest {
+  // scene 与网关头 X-NOFX-LLM-Scene / X-NOFX-Scene 对齐时可传入；缺省由服务端推断。
+  string scene = 1;
+  // model_id 用于在返回运行目标前校验平台模型启用状态。
+  string model_id = 2 [json_name = "modelId"];
+}
+
+// LLMBindRequest 模型网关绑定动作的请求体。
+message LLMBindRequest {
+  // regenerate 为 true 时可触发虚拟 Key 等凭证轮换（具体语义以后端实现为准）。
+  bool regenerate = 1;
+}
+
+// GenericEnvelope llm-runtime 对部分自有 JSON 接口的统一响应壳（code/message/data）。
+message GenericEnvelope {
+  int32 code = 1;
+  string message = 2;
+  google.protobuf.Struct data = 3;
+}
+
+// RuntimeTargetData 运行时目标载荷。
+message RuntimeTargetData {
+  string api_url = 1 [json_name = "apiUrl"];
+  string compatibility = 2;
+  string scene = 3;
+  string source = 4;
+}
+
+// RuntimeTargetResponse GetV1RuntimeTarget 的完整响应壳。
+message RuntimeTargetResponse {
+  int32 code = 1;
+  string message = 2;
+  RuntimeTargetData data = 3;
+}

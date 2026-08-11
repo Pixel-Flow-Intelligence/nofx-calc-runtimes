@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package nofx.backend.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/backend/v1;backendv1";
+
+import "google/api/annotations.proto";
+
+// BackendHealthService 提供后端最小 gRPC 自检占位能力（供网关与 Proto 链路对齐）。
+service BackendHealthService {
+  rpc Ping(PingRequest) returns (PingResponse) {
+    option (google.api.http) = {
+      get: "/api/proto-health/ping"
+    };
+  }
+}
+
+message PingRequest {}
+
+message PingResponse {
+  string status = 1;
+}

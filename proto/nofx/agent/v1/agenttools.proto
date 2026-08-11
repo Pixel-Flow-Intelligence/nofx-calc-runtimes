@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package nofx.agent.v1;
+
+option go_package = "nofx/api/grpcpb/agentv1;agentv1";
+
+// AgentTools 供共享 agent-runtime 通过 gRPC 调用的业务工具接口（对齐原受保护路由下的 agent-tools HTTP）。
+// 多数 RPC 以只读查询为主；写操作须满足与原 HTTP 相同的鉴权与审计约束。
+service AgentTools {
+  // MarketSnapshot 拉取指定交易对/交易所的行情快照类数据（具体字段见 input_json 约定）。
+  rpc MarketSnapshot(AgentToolRequest) returns (AgentToolResponse);
+  // StrategyList 分页或筛选返回当前用户可见的策略列表。
+  rpc StrategyList(AgentToolRequest) returns (AgentToolResponse);
+  // StrategyDetail 按策略 ID 返回策略详情（含配置摘要等，取决于后端实现）。
+  rpc StrategyDetail(AgentToolRequest) returns (AgentToolResponse);
+  // AgentContext 按智能体 ID 返回智能体绑定配置与执行上下文。
+  rpc AgentContext(AgentToolRequest) returns (AgentToolResponse);
+  // AccountPositions 返回指定智能体或账户上下文的持仓聚合（合约/现货视 input_json 而定）。
+  rpc AccountPositions(AgentToolRequest) returns (AgentToolResponse);
+  // AccountStatistics 返回账户维度统计（盈亏、权益等，字段由后端 JSON 约定）。
+  rpc AccountStatistics(AgentToolRequest) returns (AgentToolResponse);
+  // BackendAPI 供 agent-runtime 以 gRPC 方式调用既有 /api/* 业务接口，避免工具层回退到 HTTP client。
+  rpc BackendAPI(AgentToolRequest) returns (AgentToolResponse);
+  // LLMRuntimeTarget 查询当前用户可用的模型运行时绑定快照，供 llm-runtime 路由模型请求。
+  rpc LLMRuntimeTarget(AgentToolRequest) returns (AgentToolResponse);
+  // UpsertLLMUserBinding 将模型网关侧用户标识、虚拟 Key、绑定状态写回业务 users 表；调用方 Bearer 须与目标用户一致。
+  rpc UpsertLLMUserBinding(AgentToolRequest) returns (AgentToolResponse);
+}
+
+message AgentToolRequest {
+  // 业务用户 ID（与网关注入的身份一致，用于审计与数据隔离）。
+  string user_id = 1;
+  // 分布式追踪 ID，贯穿 agent-runtime 与 backend，便于日志关联。
+  string trace_id = 2;
+  // 与各 HTTP 工具路由的 query/body 等价：JSON 对象序列化后的字符串，例如 {"symbol":"BTCUSDT"}、{"agentId":"..."}。
+  string input_json = 3;
+}
+
+message AgentToolResponse {
+  // 与原先 HTTP 响应 body 一致：成功时为业务 JSON；失败时可为错误 JSON（结构依后端约定）。
+  string json_payload = 1;
+  // 对齐原 HTTP 状态码（如 200、400、401），agent-runtime 据此区分成功与可重试失败。
+  int32 status_code = 2;
+}

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package nofx.data.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/data/v1;datav1";
+
+// DataRuntimeService 提供运行时内部路由代理，供 gateway、admin-backend 和 backtest-runtime 复用数据服务能力。
+service DataRuntimeService {
+  rpc ProxyRoute(ProxyRouteRequest) returns (ProxyRouteResponse);
+  rpc RunMarketIntelSync(RunMarketIntelSyncRequest) returns (ActionResponse);
+  rpc RunMarketResearch(RunMarketResearchRequest) returns (ActionResponse);
+  rpc AdminControlAction(AdminControlActionRequest) returns (AdminControlActionResponse);
+}
+
+message ProxyRouteRequest {
+  string caller_service = 1;
+  string user_id = 2;
+  string email = 3;
+  string method = 4;
+  string path = 5;
+  string raw_query = 6;
+  string body = 7;
+  string content_type = 8;
+  string request_id = 9;
+}
+
+message ProxyRouteResponse {
+  int32 status_code = 1;
+  string content_type = 2;
+  string body = 3;
+}
+
+message RunMarketIntelSyncRequest {
+  string caller_service = 1;
+}
+
+message RunMarketResearchRequest {
+  string caller_service = 1;
+}
+
+message ActionResponse {
+  bool ok = 1;
+  string message = 2;
+}
+
+message AdminControlActionRequest {
+  string caller_service = 1;
+  string action = 2;
+  string input_json = 3;
+}
+
+message AdminControlActionResponse {
+  int32 status_code = 1;
+  string json_payload = 2;
+}

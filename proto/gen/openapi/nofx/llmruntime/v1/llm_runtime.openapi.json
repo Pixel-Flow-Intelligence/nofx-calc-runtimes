@@ -1,0 +1,282 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "llm_runtime",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/chat/completions": {
+      "post": {
+        "tags": [
+          "LLMRuntimeService"
+        ],
+        "summary": "PostV1ChatCompletions 转发 OpenAI 兼容的聊天补全请求；请求体为任意 JSON（模型名、messages、参数等）。",
+        "operationId": "LLMRuntimeService_PostV1ChatCompletions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fields": {
+                    "type": "object",
+                    "description": "Unordered map of dynamically typed values.",
+                    "additionalProperties": {}
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/google.rpc.Status"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models": {
+      "get": {
+        "tags": [
+          "LLMRuntimeService"
+        ],
+        "summary": "GetV1Models 返回当前用户可见模型列表等业务封装（HTTP 自有壳 JSON，见 GenericEnvelope）。",
+        "operationId": "LLMRuntimeService_GetV1Models",
+        "parameters": [
+          {
+            "name": "scene",
+            "in": "query",
+            "description": "scene 区分调用场景（如 agent / research）；缺省时运行时可按默认 agent 行为处理。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/google.rpc.Status"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "GenericEnvelope llm-runtime 对部分自有 JSON 接口的统一响应壳（code/message/data）。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nofx.llmruntime.v1.GenericEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime-target": {
+      "get": {
+        "tags": [
+          "LLMRuntimeService"
+        ],
+        "summary": "GetV1RuntimeTarget 返回模型路由所需的运行时目标（URL、场景、兼容模式等）。",
+        "operationId": "LLMRuntimeService_GetV1RuntimeTarget",
+        "parameters": [
+          {
+            "name": "scene",
+            "in": "query",
+            "description": "scene 与网关头 X-NOFX-LLM-Scene / X-NOFX-Scene 对齐时可传入；缺省由服务端推断。",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "modelId",
+            "in": "query",
+            "description": "model_id 用于在返回运行目标前校验平台模型启用状态。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/google.rpc.Status"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "RuntimeTargetResponse GetV1RuntimeTarget 的完整响应壳。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nofx.llmruntime.v1.RuntimeTargetResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/llm/bind": {
+      "post": {
+        "tags": [
+          "LLMRuntimeService"
+        ],
+        "summary": "PostV1UserLlmBind 为用户建立或刷新模型网关绑定（可选强制重新签发虚拟 Key）。",
+        "operationId": "LLMRuntimeService_PostV1UserLlmBind",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "regenerate": {
+                    "type": "boolean",
+                    "description": "regenerate 为 true 时可触发虚拟 Key 等凭证轮换（具体语义以后端实现为准）。"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An unexpected error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/google.rpc.Status"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "GenericEnvelope llm-runtime 对部分自有 JSON 接口的统一响应壳（code/message/data）。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nofx.llmruntime.v1.GenericEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "google.rpc.Status": {
+        "type": "object",
+        "description": "The Status type defines a logical error model suitable for different programming environments.",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The status code, which should be an enum value of google.rpc.Code."
+          },
+          "details": {
+            "type": "array",
+            "description": "A list of messages that carry the error details.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "@type": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "A developer-facing error message."
+          }
+        }
+      },
+      "nofx.llmruntime.v1.GenericEnvelope": {
+        "type": "object",
+        "description": "GenericEnvelope llm-runtime 对部分自有 JSON 接口的统一响应壳（code/message/data）。",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "nofx.llmruntime.v1.RuntimeTargetData": {
+        "type": "object",
+        "description": "RuntimeTargetData 运行时目标载荷。",
+        "properties": {
+          "apiUrl": {
+            "type": "string"
+          },
+          "compatibility": {
+            "type": "string"
+          },
+          "scene": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
+      "nofx.llmruntime.v1.RuntimeTargetResponse": {
+        "type": "object",
+        "description": "RuntimeTargetResponse GetV1RuntimeTarget 的完整响应壳。",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/nofx.llmruntime.v1.RuntimeTargetData"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "LLMRuntimeService",
+      "description": "LLMRuntimeService 描述 llm-runtime 对外业务能力 HTTP 契约（与 Gin 中业务路由一致）。\nGET /docs、GET /openapi.yaml 仅为运行时文档与自检入口，由 Gin 手写挂载，不纳入 Proto/OpenAPI 契约。\n本文件供 Buf / protoc-gen-openapiv3 生成 OpenAPI，并经脚本同步到 llm-runtime/openapi/openapi.yaml。"
+    }
+  ]
+}

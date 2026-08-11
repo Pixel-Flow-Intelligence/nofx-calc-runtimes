@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package nofx.user.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/user/v1;userv1";
+
+// UserRuntimeService 承载 user-runtime 对内部模块暴露的用户域 gRPC 能力。
+// 该服务只允许后端内部调用，前端与 CLI 仍通过 gateway / business 暴露的 HTTP 接口访问。
+service UserRuntimeService {
+  rpc AdminListUsers(AdminListUsersRequest) returns (AdminListUsersResponse);
+  rpc AdminCreateUser(AdminCreateUserRequest) returns (AdminUserResponse);
+  rpc AdminUpdateUser(AdminUpdateUserRequest) returns (AdminUserResponse);
+  rpc AdminPurgeAllAppUsers(AdminPurgeAllAppUsersRequest) returns (AdminPurgeAllAppUsersResponse);
+  rpc GetLLMBinding(GetLLMBindingRequest) returns (GetLLMBindingResponse);
+  rpc EnsureLLMBinding(EnsureLLMBindingRequest) returns (EnsureLLMBindingResponse);
+  rpc VerifyLLMBinding(VerifyLLMBindingRequest) returns (VerifyLLMBindingResponse);
+  rpc ListBuiltinAgents(ListBuiltinAgentsRequest) returns (BuiltinAgentsResponse);
+  rpc EnsureBuiltinAgents(EnsureBuiltinAgentsRequest) returns (BuiltinAgentsResponse);
+}
+
+message AdminListUsersRequest {}
+
+message AdminUserView {
+  string id = 1;
+  string email = 2;
+  bool otp_verified = 3;
+  bool otp_enabled = 4;
+  string assist_select_model_id = 5;
+  string llm_api_key_status = 6;
+  string llm_user_id = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  int32 strategy_count = 10;
+  int64 uid = 11;
+}
+
+message AdminListUsersResponse {
+  repeated AdminUserView items = 1;
+}
+
+message AdminCreateUserRequest {
+  string email = 1;
+  string password = 2;
+  bool otp_enabled = 3;
+  string assist_select_model_id = 4;
+  string llm_api_key_status = 5;
+}
+
+message AdminUpdateUserRequest {
+  string user_id = 1;
+  optional string email = 2;
+  optional string password = 3;
+  optional bool otp_verified = 4;
+  optional bool otp_enabled = 5;
+  optional string assist_select_model_id = 6;
+  optional string llm_api_key_status = 7;
+}
+
+message AdminUserResponse {
+  AdminUserView item = 1;
+}
+
+message AdminPurgeAllAppUsersRequest {}
+
+message AdminPurgeAllAppUsersResponse {
+  int64 deleted_count = 1;
+}
+
+message GetLLMBindingRequest {
+  string user_id = 1;
+}
+
+message GetLLMBindingResponse {
+  string app_user_id = 1;
+  string status = 2;
+  bool has_llm_api_key = 3;
+  string llm_user_id = 4;
+}
+
+message EnsureLLMBindingRequest {
+  string user_id = 1;
+}
+
+message EnsureLLMBindingResponse {
+  string message = 1;
+  string app_user_id = 2;
+  string llm_user_id = 3;
+  string status = 4;
+  string default_model = 5;
+  int32 model_count = 6;
+}
+
+message VerifyLLMBindingRequest {
+  string user_id = 1;
+  string model_id = 2;
+}
+
+message VerifyLLMBindingResponse {
+  string app_user_id = 1;
+  string status = 2;
+  string llm_user_id = 3;
+  string model_id = 4;
+  bool binding_ok = 5;
+  bool model_ok = 6;
+  bool chat_ok = 7;
+  bool ok = 8;
+  string reason = 9;
+}
+
+message BuiltinAgentView {
+  string agent_id = 1;
+  string agent_template_id = 2;
+  string user_agent_name = 3;
+  string name = 4;
+  string status = 5;
+  string description = 6;
+  string exchange = 7;
+  string exchange_type = 8;
+}
+
+message ListBuiltinAgentsRequest {
+  string user_id = 1;
+}
+
+message EnsureBuiltinAgentsRequest {
+  string user_id = 1;
+}
+
+message BuiltinAgentsResponse {
+  string user_id = 1;
+  int32 count = 2;
+  repeated BuiltinAgentView items = 3;
+}

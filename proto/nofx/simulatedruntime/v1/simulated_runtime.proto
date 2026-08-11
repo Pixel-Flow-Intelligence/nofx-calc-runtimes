@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package nofx.simulatedruntime.v1;
+
+option go_package = "nofx/proto/gen/go/nofx/simulatedruntime/v1;simulatedruntimev1";
+
+// SimulatedRuntimeService 承载模拟交易所相关执行能力。
+// 业务服务通过 gRPC 调用它，逐步把模拟交易逻辑从 business 主进程中拆出去。
+service SimulatedRuntimeService {
+  rpc EnsureBuiltinAgentRuntime(EnsureBuiltinAgentRuntimeRequest) returns (RuntimeRecordResponse);
+  rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse);
+  rpc ClosePosition(ClosePositionRequest) returns (ActionResponse);
+  rpc RefreshEquity(RefreshEquityRequest) returns (ActionResponse);
+  rpc GetAccountInfo(GetAccountInfoRequest) returns (GetAccountInfoResponse);
+}
+
+message RuntimeRecordData {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string exchange_id = 4;
+  double initial_balance = 5;
+  double balance = 6;
+  string position_mode = 7;
+}
+
+message PositionData {
+  string symbol = 1;
+  string side = 2;
+  double entry_price = 3;
+  double mark_price = 4;
+  double quantity = 5;
+  double leverage = 6;
+  double unrealized_pnl = 7;
+  double margin_used = 8;
+}
+
+message EnsureBuiltinAgentRuntimeRequest {
+  string user_id = 1;
+  string agent_id = 2;
+  string exchange_id = 3;
+  string exchange_type = 4;
+}
+
+message RuntimeRecordResponse {
+  RuntimeRecordData record = 1;
+}
+
+message PlaceOrderRequest {
+  string user_id = 1;
+  string runtime_id = 2;
+  string trader_id = 3;
+  string symbol = 4;
+  string action = 5;
+  double quantity = 6;
+  int64 leverage = 7;
+  double stop_loss = 8;
+  double take_profit = 9;
+  string order_type = 10;
+  double limit_price = 11;
+}
+
+message PlaceOrderResponse {
+  string order_id = 1;
+  string symbol = 2;
+  string action = 3;
+  double quantity = 4;
+  double price = 5;
+  double stop_loss = 6;
+  double take_profit = 7;
+  string order_type = 8;
+  double limit_price = 9;
+}
+
+message ClosePositionRequest {
+  string user_id = 1;
+  string runtime_id = 2;
+  string symbol = 3;
+  string side = 4;
+  string close_reason = 5;
+}
+
+message RefreshEquityRequest {
+  string runtime_id = 1;
+}
+
+message GetAccountInfoRequest {
+  string runtime_id = 1;
+}
+
+message GetAccountInfoResponse {
+  double total_wallet_balance = 1;
+  double total_unrealized_profit = 2;
+  double available_balance = 3;
+  double available_margin = 4;
+  double total_equity = 5;
+  double realized_pnl = 6;
+  repeated PositionData positions = 7;
+}
+
+message ActionResponse {
+  bool ok = 1;
+}
