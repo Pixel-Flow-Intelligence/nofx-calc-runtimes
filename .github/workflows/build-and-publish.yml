@@ -1,9 +1,6 @@
-name: 自动构建并发布算力服务镜像 (GHCR)
+name: 构建并发布算力服务镜像 (GHCR)
 
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
   workflow_dispatch:
 
 env:
