@@ -1,15 +1,8 @@
 go 1.25
 
 use (
-	./app/backend/admin
-	./app/backend/market
-	./app/backend/llm
-	./app/backend/ta-lib
-	./app/backend/pandas-ta
-	./app/backend/trendln
-	./app/backend/trading
-	./app/backend/user
-	./app/backend/core
-	./app/backend/push
+	./ta-lib
+	./pandas-ta
+	./trendln
 	./proto/gen/go
 )
