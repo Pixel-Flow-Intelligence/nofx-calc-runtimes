@@ -4,5 +4,6 @@ use (
 	./ta-lib
 	./pandas-ta
 	./trendln
+	../../../Project/nofx/app/backend/core
 	./proto/gen/go
 )
