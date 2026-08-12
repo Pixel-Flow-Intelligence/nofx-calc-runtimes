@@ -1,9 +1,9 @@
-go 1.25
+go 1.25.0
 
 use (
-	./ta-lib
+	../nofx-core-runtime/app/backend/core
 	./pandas-ta
+	./ta-lib
 	./trendln
-	../../../Project/nofx/app/backend/core
 	./proto/gen/go
 )
